@@ -28,6 +28,7 @@ const io = socketio(app);
 
 const JUMP_VELOCITY = 400;
 const GRAVITY_FORCE = -400;
+const MOVE_SPEED = 400;
 
 const getRandomInt = (min, max) => (Math.random() * (max - min)) + min;
 const getRandomBrightColor = () => `hsl(${getRandomInt(0, 359)}, 100%, 50%)`;
@@ -37,6 +38,7 @@ io.on('connection', (socket) => {
     x: getRandomInt(100, 500),
     y: getRandomInt(700, 800),
     velY: 0,
+    velX: 0,
     color: getRandomBrightColor(),
     id: socket.id,
   };
@@ -48,6 +50,10 @@ io.on('connection', (socket) => {
       playerJumpReady[socket.id] = false;
     }
   });
+
+  socket.on('move', (direction) => {
+    players[socket.id].velX = MOVE_SPEED * direction;
+  })
 
   socket.on('disconnect', () => {
     socket.broadcast.emit('terminate', { id: socket.id });
@@ -74,6 +80,7 @@ const simulationLoop = (playerList) => {
       const player = playerList[playerIds[n]];
       player.velY += GRAVITY_FORCE * dT;
       player.y += player.velY * dT;
+      player.x += player.velX * dT;
 
       if (player.y <= 0) {
         player.velY = 0;

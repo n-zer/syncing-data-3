@@ -73,8 +73,19 @@ const init = () => {
 };
 
 window.addEventListener('keydown', (e) => {
-	if(!e.repeat)
-		socket.emit('jump');
-})
+	if(!e.repeat) {
+		if(e.key === 'ArrowLeft')
+			socket.emit('move', -1);
+		else if(e.key === 'ArrowRight')
+			socket.emit('move', 1);
+		else if(e.key === ' ')
+			socket.emit('jump');
+	}
+});
+
+window.addEventListener('keyup', (e) => {
+	if(e.key === 'ArrowLeft' || e.key === 'ArrowRight')
+		socket.emit('move', 0);
+});
 
 window.onload = init;
